@@ -1,0 +1,13 @@
+
+    <group ns="Casper_Display">
+      <node pkg="casper" name="Casper_Display" type="Casper_Display.py"/>
+    </group>
+
+    <group ns="Casper_Intelligence">
+      <node pkg="casper" name="Casper_Intelligence" type="Casper_Intelligence.py"/>
+    </group>
+    
+    <group ns="Casper_Cloud">
+      <node pkg="casper" name="Casper_Cloud" type="Casper_Cloud.py"/>
+    </group>
+

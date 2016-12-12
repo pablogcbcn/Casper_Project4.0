@@ -1,0 +1,11 @@
+<launch>
+
+    <group ns="Casper_Sensing">
+      <node pkg="casper" type="Casper_Sensing.py" name="Sensing" respawn ="true"/>
+    </group>
+
+    <group ns="Casper_Motion">
+      <node pkg="casper" type="Casper_Motion.py" name="Motion" respawn="true"/>
+    </group>
+
+</launch>
