@@ -1,11 +1,11 @@
 #ifndef RACOM_h
 #define RACOM_h
 
-#define I2C_INTERFACE
+#include <Arduino.h>
 
 #define PHY_EN
 #define DL_EN
-//#define TP_EN
+#define TP_EN
 
 #if !defined(UART_INTERFACE) && !defined(I2C_INTERFACE)
 #define UART_INTERFACE  // default interface
@@ -30,7 +30,7 @@
 #endif
 #define MAX_FDATA_SIZE (RACOM_RX_BUFFER-4)
 
-#include <Arduino.h>
+
 #include "RACOM_TP.h"
 
 #endif
