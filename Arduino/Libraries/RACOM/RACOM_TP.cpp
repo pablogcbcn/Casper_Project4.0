@@ -191,4 +191,4 @@ int8_t RACOM_TP::readSM(){
     return 0;
 }
 
-RACOM_TP RacomTP = RACOM_TP();
+RACOM_TP Racom = RACOM_TP();

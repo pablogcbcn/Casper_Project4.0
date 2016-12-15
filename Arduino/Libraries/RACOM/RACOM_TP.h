@@ -29,6 +29,6 @@ class RACOM_TP {
     uint8_t cmd();
 };
 
-extern RACOM_TP RacomTP;
+extern RACOM_TP Racom;
 
 #endif
