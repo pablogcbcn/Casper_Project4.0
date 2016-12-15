@@ -1,5 +1,4 @@
-#include "RacomSensing.h" // needed to choose the used interface (see RacomSensing.h)
-#include <RACOM.h> // include RACOM lib
+#include <RacomSerial.h> // include RACOM lib
 
 void setup() {
   RacomDL.begin(); // begin Data Layer
@@ -11,7 +10,7 @@ void loop() {
     //read the size of the available packet
     uint8_t pSize = RacomDL.pSize(); 
     // allocate memory for the packet
-    uint8_t *packet = malloc(pSize);
+    uint8_t *packet = (uint8_t*)malloc(pSize);
     // read the packet and test if the reading suceeded
     if(RacomDL.read(&pSize,packet)==1){
       //send back the exact same packet for testing purposes

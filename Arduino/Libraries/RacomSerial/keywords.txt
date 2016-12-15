@@ -1,0 +1,16 @@
+# Syntax Coloring Map for Dynamixel Library Smart Actuators
+
+# Datatypes (KEYWORD1)
+
+RacomTP        	KEYWORD1
+
+# Methods and Functions (KEYWORD2)
+
+begin           	KEYWORD2
+end             	KEYWORD2
+
+
+# Constants (LITERAL1)
+
+OFF     	        LITERAL1
+ON              	LITERAL1
