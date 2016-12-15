@@ -7,7 +7,7 @@ void RACOM_DL::begin() {
   _available = 0;
   _pSize = 0;
   _cnt = 0;
-  _packet = malloc(MAX_FDATA_SIZE+2);
+  _packet = (uint8_t*) malloc(MAX_FDATA_SIZE+2);
   RacomPHY.begin();
   
 }

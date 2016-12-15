@@ -116,7 +116,7 @@ int8_t RACOM_TP::readSM(){
     RacomDL.flushRx();
     
     if(_data == NULL) {
-      _data = malloc(pSize-2);
+      _data = (uint8_t*)malloc(pSize-2);
       if(_data == NULL){
         okReply[1] = 0xFF;
         RacomDL.send(2,okReply);
@@ -126,7 +126,7 @@ int8_t RACOM_TP::readSM(){
     else {
       
       uint8_t* tmpPtr;
-      tmpPtr = realloc(_data,_dSize+pSize-2);
+      tmpPtr = (uint8_t*)realloc(_data,_dSize+pSize-2);
       if(tmpPtr != NULL)
         _data=tmpPtr;
       else {

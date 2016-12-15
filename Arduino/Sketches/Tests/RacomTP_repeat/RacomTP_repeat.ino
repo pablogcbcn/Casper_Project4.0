@@ -8,14 +8,16 @@ void setup() {
 void loop() {
   // first check if a packet is available
   if(Racom.available() == 1) {
+    // read the cmd byte
+    uint8_t cmd = Racom.cmd();
     //read the size of the available data
     uint16_t dSize = Racom.dSize(); 
-    // allocate memory for the packet
+    // allocate memory for the data
     uint8_t *data = malloc(dSize);
-    // read the packet and test if the reading suceeded
-    if(Racom.read(&dSize,data)==1){
+    // read the data and test if the reading suceeded
+    if(Racom.read(&cmd,&dSize,data)==1){
       //send back the exact same packet for testing purposes
-      Racom.send(dSize,data);
+      Racom.send(cmd,dSize,data);
     }
     //free the packet memory
     free(data);
