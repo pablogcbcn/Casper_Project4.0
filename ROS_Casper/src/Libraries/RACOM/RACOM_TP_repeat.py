@@ -11,8 +11,8 @@ def test(s):
 	#for i in data:
 	#	data[i] = randint(0,255)
 		
-	RacomTP.send(cmd,data)
-	return 0
+	print RacomTP.send(cmd,data)
+	#return 0
 	
 	_t0 = datetime.now()
 	while True :
