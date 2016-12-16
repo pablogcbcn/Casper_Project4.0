@@ -5,27 +5,26 @@ from datetime import datetime
 
 
 def test(s):
-    data = range(s)
-    cmd = 1
-    #sys.stdout.write("Test " + str(s) + " :\t")
-    for i in data:
-        data[i] = randint(0,255)
-    
-    #sys.stdout.write("Sending\t\t")
+	data = range(s)
+	cmd = 1
 
-    RacomTP.send(cmd,data)
-    while RacomTP.available() != 1 :
-        continue
-    reply = RacomTP.read()
-    #print reply
-
-    #sys.stdout.write("Received\t")#print data
-    if reply == data:
-        #print "SUCCESS"
-        return 1
+	for i in data:
+		data[i] = randint(0,255)
+		
+	RacomTP.send(cmd,data)
+	
+	_t0 = datetime.now()
+	while True :
+		code=RacomTP.available()
+		if code is -1 or (datetime.now()-t0).total_seconds() > RacomDL._TIMEOUT:
+			return 0
+		elif code is 1:
+			break
+	reply = RacomTP.read()
+	if reply == data:
+		return 1
     else:
-        #print "FAIL reply :",type(reply)
-        return 0
+		return 0
 
 print "RACOM TRANPORT LAYER TEST 01"
 

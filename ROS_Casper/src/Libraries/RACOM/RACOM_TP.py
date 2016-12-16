@@ -35,11 +35,14 @@ class RACOM_TP :
 				j+=1
 			del packet[j+2:]
 			self.RacomDL.send(packet)
-			code = self.RacomDL.available()
-			while code !=1:
-				if code <0:
-					return code
-				code = self.RacomDL.available()
+			
+			_t0 = datetime.now()
+			while True :
+				code=RacomDL.available()
+				if code is -1 or (datetime.now()-t0).total_seconds() > RacomDL._TIMEOUT:
+					return 0
+				elif code is 1:
+					break
 			
 			reply = self.RacomDL.read()
 			checkSize = reply[2]+(reply[3]<<8)

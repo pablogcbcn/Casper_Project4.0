@@ -1,4 +1,4 @@
-#include <RacomSerial.h> // include RACOM lib
+#include <RacomI2C.h> // include RACOM lib
 
 void setup() {
   Racom.begin(); // begin Transport layer
@@ -13,7 +13,7 @@ void loop() {
     //read the size of the available data
     uint16_t dSize = Racom.dSize(); 
     // allocate memory for the data
-    uint8_t *data = malloc(dSize);
+    uint8_t *data = (uint8_t*)malloc(dSize);
     // read the data and test if the reading suceeded
     if(Racom.read(&cmd,&dSize,data)==1){
 //      for(uint8_t i =0;i<dSize;i++){
