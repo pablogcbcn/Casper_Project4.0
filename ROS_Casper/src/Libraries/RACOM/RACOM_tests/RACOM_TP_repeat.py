@@ -1,5 +1,5 @@
 import sys
-from .RACOM import RACOM_TP
+from . import RACOM_TP
 from random import randint
 from datetime import datetime
 
