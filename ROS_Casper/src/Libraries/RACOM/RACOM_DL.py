@@ -20,7 +20,7 @@ class RACOM_DL(object):
     _cnt = 0
     _available = 0
 
-    MAX_PDATA_SIZE = 0
+    MAX_PDATA_SIZE = 1
     
     def __init__(self,interfaceName):
         """
