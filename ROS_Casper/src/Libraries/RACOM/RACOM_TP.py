@@ -40,7 +40,7 @@ class RACOM_TP :
 			
 			_t0 = datetime.now()
 			while True :
-				code=RacomDL.available()
+				code=self.RacomDL.available()
 				if code is -1 or (datetime.now()-t0).total_seconds() > RacomDL._TIMEOUT:
 					return 0
 				elif code is 1:
