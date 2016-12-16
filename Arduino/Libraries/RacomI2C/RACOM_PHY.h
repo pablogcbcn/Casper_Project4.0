@@ -8,16 +8,15 @@
 class RACOM_PHY {
   private:
     #ifdef I2C_INTERFACE
-    uint8_t _TXBuffer[32];
-    uint8_t _RXBuffer[32];
-    uint8_t _TXcnt;
-    uint8_t _RXcnt;
-    static void receiveEvent(int n);
-    static void requestEvent();
+    
     #endif
   public:
     #ifdef I2C_INTERFACE
     uint8_t _LBsize;
+	uint8_t _TXBuffer[32];
+    uint8_t _RXBuffer[32];
+    uint8_t _TXcnt;
+    uint8_t _RXcnt;
     #endif
     
     RACOM_PHY();
@@ -33,6 +32,8 @@ class RACOM_PHY {
     //static void requestEvent();
     
 };
+void receiveEvent(int n);
+void requestEvent();
 
 extern RACOM_PHY RacomPHY;
 

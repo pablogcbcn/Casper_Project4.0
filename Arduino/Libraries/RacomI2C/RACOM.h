@@ -23,7 +23,7 @@
 //-----TP Options----------
 
 //-----General Options-----
-#define TIMEOUT 100
+#define TIMEOUT 500	//ms
 
 
 

@@ -2,6 +2,7 @@
 
 void setup() {
   RacomDL.begin(); // begin Data Layer
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -16,9 +17,10 @@ void loop() {
       //send back the exact same packet for testing purposes
       RacomDL.send(pSize,packet);
     }
+    Serial.println("DONE");
+    Serial.flush();
     //free the packet memory
     free(packet);
     packet = NULL;
   }
-
 }
