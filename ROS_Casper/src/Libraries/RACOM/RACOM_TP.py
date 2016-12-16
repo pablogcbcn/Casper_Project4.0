@@ -11,7 +11,7 @@ class RACOM_TP :
 	
 	def __init__(self,interfaceName):
 		self.RacomDL=RACOM_DL(interfaceName)
-	
+		self._TIMEOUT = self.RacomDL._TIMEOUT
 	def available(self):
 		return self.readSM()
 

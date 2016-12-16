@@ -16,7 +16,7 @@ def test(s):
 	_t0 = datetime.now()
 	while True :
 		code=RacomTP.available()
-		if code is -1 or (datetime.now()-_t0).total_seconds() > RacomDL._TIMEOUT:
+		if code is -1 or (datetime.now()-_t0).total_seconds() > RacomTP._TIMEOUT:
 			return 0
 		elif code is 1:
 			break
