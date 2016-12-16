@@ -49,7 +49,7 @@ for i in range(N):
 		ko+=1
 	else:
 		ok+=1
-	sys.stdout.write("\t %d %% complete         \r" % int(i/(N-1.0)*100))
+	sys.stdout.write("\t %d %% complete         \r" % int((i+1.0)/(N)*100))
 	sys.stdout.flush()
 		
 t1 = datetime.now()

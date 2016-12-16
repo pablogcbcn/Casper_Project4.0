@@ -1,4 +1,4 @@
-#include <RacomI2C.h> // include RACOM lib
+#include <RacomSerial.h> // include RACOM lib
 
 void setup() {
   Racom.begin(); // begin Transport layer
