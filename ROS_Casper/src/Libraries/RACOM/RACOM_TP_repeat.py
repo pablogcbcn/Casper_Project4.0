@@ -8,8 +8,8 @@ def test(s):
 	data = range(s)
 	cmd = 1
 
-	for i in data:
-		data[i] = randint(0,255)
+	#for i in data:
+	#	data[i] = randint(0,255)
 		
 	RacomTP.send(cmd,data)
 	

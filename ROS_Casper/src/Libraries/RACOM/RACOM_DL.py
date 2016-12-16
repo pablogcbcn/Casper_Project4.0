@@ -50,6 +50,7 @@ class RACOM_DL(object):
     def send(self,packet):
         frame = self.formatPacket(packet)
         self.RacomPHY.write(frame)
+		sleep(0.5)
 
     def read(self):
         if self._available == 1:
