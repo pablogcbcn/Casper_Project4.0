@@ -12,8 +12,7 @@ def test(s):
 	#	data[i] = randint(0,255)
 		
 	RacomTP.send(cmd,data)
-	#return 0
-	
+
 	_t0 = datetime.now()
 	while True :
 		code=RacomTP.available()
