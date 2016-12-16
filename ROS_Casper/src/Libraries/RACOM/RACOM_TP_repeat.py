@@ -23,7 +23,7 @@ def test(s):
 	reply = RacomTP.read()
 	if reply == data:
 		return 1
-    else:
+	else:
 		return 0
 
 print "RACOM TRANPORT LAYER TEST 01"
