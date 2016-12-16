@@ -22,7 +22,7 @@ def test(s):
 	_t0 = datetime.now()
 	while True :
 		code=RacomDL.available()
-		if code is -1 or (datetime.now()-t0).total_seconds() > RacomDL._TIMEOUT:
+		if code is -1 or (datetime.now()-_t0).total_seconds() > RacomDL._TIMEOUT:
 			return 0
 		elif code is 1:
 			break
