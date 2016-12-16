@@ -11,7 +11,7 @@ void RACOM_PHY::begin(){
     Wire.onReceive(receiveEvent);
     _TXcnt=0;
     _RXcnt=0;
-    for(int i=0;i<sizeof(RacomPHY._TXBuffer);i++)
+    for(uint8_t i=0;i<sizeof(RacomPHY._TXBuffer);i++)
       RacomPHY._TXBuffer[i]=0;
   #endif
 }
@@ -48,6 +48,9 @@ uint8_t RACOM_PHY::write(uint8_t* buf,uint8_t len){
   #elif defined(I2C_INTERFACE)
     memcpy(_TXBuffer+_TXcnt,buf,len);
     _TXcnt+=len;
+	while(_TXcnt!=0){
+		delay(1);
+	}
     return len;
   #endif
 }
@@ -64,35 +67,23 @@ uint8_t RACOM_PHY::read(){
 }
 
 #ifdef I2C_INTERFACE
-static void RACOM_PHY::receiveEvent(int n) {
-  // check if byte received when reading by the rpi
-  RacomPHY._LBsize = Wire.available();
-  Serial.print("Received: ");
-  while (Wire.available()>0){
-    RacomPHY._RXBuffer[RacomPHY._RXcnt]=Wire.read();
-    RacomPHY._RXcnt++;
-    Serial.print(RacomPHY._RXBuffer[RacomPHY._RXcnt-1]);
-    Serial.print(" ");
+void receiveEvent(int n) {
+  while(Wire.available()>0){
+	RacomPHY._RXBuffer[RacomPHY._RXcnt]=Wire.read();
+	RacomPHY._RXcnt+=1;
   }
-  Serial.println("");
-  
 }
 
-static void RACOM_PHY::requestEvent() {
-  Serial.print("TX buffer: ");
-  for(uint8_t i=0;i<RacomPHY._TXcnt;i++) {
-    Serial.print(RacomPHY._TXBuffer[i]);
-    Serial.print(" ");
-  }
-  Serial.println("");
+void requestEvent() {
   RacomPHY._RXcnt -= 1;
   uint8_t toRead = RacomPHY._RXBuffer[RacomPHY._RXcnt];
-  if(toRead>RacomPHY._TXcnt)
+  if(toRead>RacomPHY._TXcnt || toRead ==0){
+	Wire.write(42);
     return;
+  }
   Wire.write(RacomPHY._TXBuffer,toRead);
   memcpy(RacomPHY._TXBuffer,RacomPHY._TXBuffer+toRead,sizeof(RacomPHY._TXBuffer)-toRead);
   RacomPHY._TXcnt -= toRead;
-  
 }
 #endif
 

@@ -19,16 +19,23 @@ void RACOM_DL::end() {
 }
 
 uint8_t RACOM_DL::send(uint8_t pSize, uint8_t* packet) {
-  RacomPHY.write(_STX);
-  RacomPHY.write((uint8_t)(pSize<<2) + (packet[0] & 0b11));
-  if(pSize==2)
-    RacomPHY.write(*(packet+1));
-  else if(pSize>2)
-    RacomPHY.write((packet+1),(pSize-1));
+	#ifdef I2C_INTERFACE
+		RacomPHY._TXcnt=0;
+	#endif
+	RacomPHY.write(_STX);
+	RacomPHY.write((uint8_t)(pSize<<2) + (packet[0] & 0b11));
+	if(pSize==2)
+		RacomPHY.write(*(packet+1));
+	else if(pSize>2)
+		RacomPHY.write((packet+1),(pSize-1));
+	return 1;
 }
 
 int8_t RACOM_DL::available(){
-  this->readSM();
+  if(this->readSM()==-1){
+	  RacomPHY.end();
+	  RacomPHY.begin();
+  }
   return _available;
 }
 
