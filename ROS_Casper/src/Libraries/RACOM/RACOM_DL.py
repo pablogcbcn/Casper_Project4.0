@@ -30,10 +30,10 @@ class RACOM_DL(object):
         self.logger = logging.getLogger(__name__)
         if interfaceName == "UART":
             self.RacomPHY = RACOM_PHY.UART(self.baudrate,self._TIMEOUT)
-            MAX_PDATA_SIZE = 60
+            self.MAX_PDATA_SIZE = 60
         elif interfaceName == "I2C":
             self.RacomPHY = RACOM_PHY.I2C(8)
-            MAX_PDATA_SIZE = 28
+            self.MAX_PDATA_SIZE = 28
         
     def formatPacket(self, packet):
         
