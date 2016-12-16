@@ -12,6 +12,7 @@ def test(s):
 	#	data[i] = randint(0,255)
 		
 	RacomTP.send(cmd,data)
+	return 0
 	
 	_t0 = datetime.now()
 	while True :
@@ -35,8 +36,8 @@ ok = 0
 ko = 0
 
 iface = raw_input("Interface to test: ") or "I2C"
-payload_size = int(raw_input("Enter payload size: ") or "128")
-N = int(raw_input("Enter number of tests:") or "100")
+payload_size = int(raw_input("Enter payload size: ") or "16")
+N = int(raw_input("Enter number of tests:") or "10")
 sys.stdout.write("Testing: ")
 print iface,"interface"
 RacomTP = RACOM_TP(iface)
