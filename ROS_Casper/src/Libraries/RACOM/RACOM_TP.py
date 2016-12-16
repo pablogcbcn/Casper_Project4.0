@@ -5,11 +5,10 @@ class RACOM_TP :
 	_data = []
 	_dSize = 0
 	_cmd=0
-	
-	RacomDL = RACOM_DL("I2C")
+
 	
 	def __init__(self,interfaceName):
-		RacomDL=RACOM_DL(interfaceName)
+		self.RacomDL=RACOM_DL(interfaceName)
 	
 	def available(self):
 		return self.readSM()

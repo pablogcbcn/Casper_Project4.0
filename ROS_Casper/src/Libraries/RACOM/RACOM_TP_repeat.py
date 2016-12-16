@@ -29,17 +29,18 @@ def test(s):
 
 print "RACOM TRANPORT LAYER TEST 01"
 
-RacomTP = RACOM_TP("UART")
-
 payload_size = 255
 N = 10
 
 ok = 0
 ko = 0
 
+iface = raw_input("Interface to test: ") or "I2C"
 payload_size = int(raw_input("Enter payload size: ") or "128")
 N = int(raw_input("Enter number of tests:") or "100")
-sys.stdout.write("Testing:")
+sys.stdout.write("Testing: ")
+print iface,"interface"
+RacomTP = RACOM_TP(iface)
 
 t0 = datetime.now()
 

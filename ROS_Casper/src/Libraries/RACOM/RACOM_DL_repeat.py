@@ -19,11 +19,16 @@ def test(s):
 	
 	RacomDL.send(data)
 	#return 0
-	sleep(0.005)
-	while RacomDL.available() != 1 :
-		continue
-	while (reply = RacomDL.read)==0
-	sleep(0.010)
+	_t0 = datetime.now()
+	while True :
+		code=RacomDL.available()
+		if code is -1 or (datetime.now()-t0).total_seconds() > RacomDL._TIMEOUT:
+			return 0
+		elif code is 1:
+			break
+		
+
+	reply = RacomDL.read()
 	#print reply
 	#sys.stdout.flush()
 	
@@ -76,7 +81,7 @@ sys.stdout.write("Time: ")
 time = (t1-t0).total_seconds()
 sys.stdout.write("\t\t%f\ts\r\n" % time)
 sys.stdout.write("Throughput: ")
-Thru = (100.0*(ok/float(N)))
+Thru = (100.0*(float(ok)/float(N)))
 sys.stdout.write("\t%f\t%%\r\n" % Thru)
 sys.stdout.write("Speed: ")
 speed = N*payload_size/time
