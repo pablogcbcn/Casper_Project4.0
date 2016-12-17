@@ -12,6 +12,7 @@ class RACOM_TP :
 	def __init__(self,interfaceName):
 		self.RacomDL=RACOM_DL(interfaceName)
 		self._TIMEOUT = self.RacomDL._TIMEOUT
+
 	def available(self):
 		return self.readSM()
 
@@ -47,9 +48,11 @@ class RACOM_TP :
 					break
 			
 			reply = self.RacomDL.read()
+			if reply is 0 or len(reply) != 3:
+				return 0
 			checkSize = reply[2]+(reply[3]<<8)
 			if checkSize!=len(packet)-2+i*60:
-				return reply[1]
+				return 0
 			packet[0]=0b11
 			if(i==nPacket-2):
 				packet[0]=0b10

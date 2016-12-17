@@ -1,7 +1,8 @@
 import sys
-from . import RACOM_TP
+from RACOM_TP import RACOM_TP
 from random import randint
 from datetime import datetime
+from time import sleep
 
 
 def test(s):
@@ -49,6 +50,7 @@ for i in range(N):
 		ko+=1
 	else:
 		ok+=1
+	sleep(0.01)
 	sys.stdout.write("\t %d %% complete         \r" % int((i+1.0)/(N)*100))
 	sys.stdout.flush()
 		

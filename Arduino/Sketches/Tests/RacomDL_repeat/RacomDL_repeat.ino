@@ -1,4 +1,4 @@
-#include <RacomSerial.h> // include RacomI2C or RacomSerial
+#include <RacomI2C.h> // include RacomI2C or RacomSerial
 
 void setup() {
   RacomDL.begin(); // begin Data Layer
