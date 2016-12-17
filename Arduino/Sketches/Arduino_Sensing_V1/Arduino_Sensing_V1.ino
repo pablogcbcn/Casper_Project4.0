@@ -1,4 +1,4 @@
-#include <RacomI2C.h>
+#include <RacomSerial.h>
 #include"Arduino_sensing_V1.h"
 
 void setup() {
@@ -23,8 +23,8 @@ void loop() {
           case get_I2C_Register:
             I2C_Init(dSize, data, _address, _register, _value);
             I2C_Receive(_address, _register, _value);
-            I2C_End(_address, _register, _value);
             Racom.send(get_I2C_Register, 1, _value);
+            I2C_End(_address, _register, _value);
             break;
           case get_SPI_Register:
             break;

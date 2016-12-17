@@ -71,6 +71,9 @@ def Mpr121_Touch():
     
     sensing_msg.mpr121L = get_I2C_register(0x5A, 0x00)
     sensing_msg.mpr121L = get_I2C_register(0x5A, 0x01)
+    rospy.loginfo("Values read from arduino:\n")
+    rospy.loginfo(sensing_msg.mpr121L)
+    rospy.loginfo(sensing_msg.mpr121H)
 
 def readSensors():
     
@@ -78,7 +81,8 @@ def readSensors():
 
 def initSensors():
 
-    initMpr121() 
+    initMpr121()
+    rospy.loginfo("MprInitializated!")
 
 def initTopics():
 
@@ -92,6 +96,7 @@ def Casper_Sensing():
     while not rospy.is_shutdown():
         readSensors() 
         pub.publish(sensing_msg)
+        rospy.loginfo("Some publish madafaka\n")
         sleep(2)
 
 if __name__ == '__main__':
