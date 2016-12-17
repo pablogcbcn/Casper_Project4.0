@@ -7,13 +7,13 @@ from casper.msg import Sensing
 from casper.msg import Stages
 from casper.msg import Gaming
 from casper.msg import Intervention
-from Libraries.RACOM import RACOM_TP
+#from Libraries.RACOM import RACOM_TP
 from Libraries.MPR121 import mpr121
 
-RacomTP = NULL
-sensing_msg = NULL
-pub = NULL
-rate = NULL
+RacomTP = None
+sensing_msg = None
+pub = None
+rate = None
 
 def set_I2C_register(address, register, value):
 
@@ -24,7 +24,8 @@ def get_I2C_register(address, register):
 
     data = [address, register]
     send(0x10, 2, data)
-    while RacomTP.available() == 0
+    while RacomTP.available() == 0:
+	pass
     return RacomTP.read()
 
 def initMpr121(): 
