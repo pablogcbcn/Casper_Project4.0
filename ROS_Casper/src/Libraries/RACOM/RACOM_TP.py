@@ -1,13 +1,12 @@
 from RACOM_DL import RACOM_DL
 from math import ceil
-from datetime import datetime
-
 
 class RACOM_TP :
 	_data = []
 	_dSize = 0
 	_cmd=0
-
+	
+	#RacomDL = RACOM_DL("I2C")
 	
 	def __init__(self,interfaceName):
 		self.RacomDL=RACOM_DL(interfaceName)
@@ -38,14 +37,11 @@ class RACOM_TP :
 				j+=1
 			del packet[j+2:]
 			self.RacomDL.send(packet)
-			
-			_t0 = datetime.now()
-			while True :
-				code=self.RacomDL.available()
-				if code is -1 or (datetime.now()-_t0).total_seconds() > self.RacomDL._TIMEOUT:
-					return 0
-				elif code is 1:
-					break
+			code = self.RacomDL.available()
+			while code !=1:
+				if code <0:
+					return code
+				code = self.RacomDL.available()
 			
 			reply = self.RacomDL.read()
 			if reply is 0 or len(reply) != 3:

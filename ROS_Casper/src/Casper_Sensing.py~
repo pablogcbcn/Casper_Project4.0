@@ -7,7 +7,7 @@ from casper.msg import Sensing
 from casper.msg import Stages
 from casper.msg import Gaming
 from casper.msg import Intervention
-from Libraries.RACOM import RACOM_TP
+#from Libraries.RACOM import RACOM_TP
 from Libraries.MPR121 import mpr121
 
 RacomTP = None
