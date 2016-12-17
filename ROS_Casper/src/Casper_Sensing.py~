@@ -10,10 +10,10 @@ from casper.msg import Intervention
 from Libraries.RACOM import RACOM_TP
 from Libraries.MPR121 import mpr121
 
-RacomTP = None
-sensing_msg = None
-pub = None
-rate = None
+RacomTP = NULL
+sensing_msg = NULL
+pub = NULL
+rate = NULL
 
 def set_I2C_register(address, register, value):
 
@@ -24,8 +24,7 @@ def get_I2C_register(address, register):
 
     data = [address, register]
     send(0x10, 2, data)
-    while RacomTP.available() == 0:
-	pass
+    while RacomTP.available() == 0
     return RacomTP.read()
 
 def initMpr121(): 
