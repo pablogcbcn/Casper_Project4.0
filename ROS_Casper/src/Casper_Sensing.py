@@ -83,13 +83,13 @@ def Mpr121_Touch():
     sensing_msg.mpr121L = l[0]
     sensing_msg.mpr121H = l[1]
     s = ""
-	for i in range(4):
+    for i in range(4):
         s += str(1 & (l[1]>>(4-i)))
-		s += "|"
+        s += "|"
     for i in range(8):
         s += str(1 & (l[0]>>(7-i)))
-		s += "|"
-    rospy.loginfo(str(sensing_msg.mpr121H) + " | " +str(sensing_msg.mpr121L))
+        s += "|"
+    rospy.loginfo(s)
 
 def readSensors():
     Mpr121_Touch()
