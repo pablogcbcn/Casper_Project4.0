@@ -28,7 +28,9 @@ class RACOM_PHY {
     uint8_t write(uint8_t val);
     uint8_t write(uint8_t* buf,uint8_t len);
     uint8_t read();
-
+	
+	void flushRx();
+	void flushTx();
     //static void requestEvent();
     
 };

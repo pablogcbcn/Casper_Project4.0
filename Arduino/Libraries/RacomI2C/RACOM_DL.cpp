@@ -7,9 +7,8 @@ void RACOM_DL::begin() {
   _available = 0;
   _pSize = 0;
   _cnt = 0;
-  _packet = (uint8_t*) malloc(MAX_FDATA_SIZE+2);
+  _packet = (uint8_t*) malloc(MAX_PDATA_SIZE+2);
   RacomPHY.begin();
-  
 }
 
 void RACOM_DL::end() {
@@ -20,7 +19,7 @@ void RACOM_DL::end() {
 
 uint8_t RACOM_DL::send(uint8_t pSize, uint8_t* packet) {
 	#ifdef I2C_INTERFACE
-		RacomPHY._TXcnt=0;
+		RacomPHY.flushTx();
 	#endif
 	RacomPHY.write(_STX);
 	RacomPHY.write((uint8_t)(pSize<<2) + (packet[0] & 0b11));
@@ -33,8 +32,8 @@ uint8_t RACOM_DL::send(uint8_t pSize, uint8_t* packet) {
 
 int8_t RACOM_DL::available(){
   if(this->readSM()==-1){
-	  RacomPHY.end();
-	  RacomPHY.begin();
+	  RacomDL.end();
+	  RacomDL.begin();
   }
   return _available;
 }
@@ -60,8 +59,7 @@ int8_t RACOM_DL::read(uint8_t* pSize, uint8_t* packet) {
 }
 
 void RACOM_DL::flushRx() {
-  while(RacomPHY.available()!=0)
-    RacomPHY.read();
+  RacomPHY.flushRx();
   this->_available = 0;
 }
 
@@ -115,6 +113,7 @@ int8_t RACOM_DL::readSM() {
       else if(_cnt==(_pSize)){
         _available = 1;
         _state = _WAITING_STATE;
+		RacomPHY.flushRx();
         return 1;
       }
       break;      
@@ -125,9 +124,7 @@ int8_t RACOM_DL::readSM() {
 #ifdef UART_INTERFACE
 void serialEvent(){
   if(RacomPHY.available()>0){
-    #ifdef DL_EN
       RacomDL.readSM();
-    #endif
   }
 }
 #elif defined(I2C_INTERFACE)

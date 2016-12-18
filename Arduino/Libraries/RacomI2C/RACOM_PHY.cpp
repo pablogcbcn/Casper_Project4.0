@@ -9,10 +9,13 @@ void RACOM_PHY::begin(){
     Wire.begin(I2C_ADDRESS);
     Wire.onRequest(requestEvent);
     Wire.onReceive(receiveEvent);
-    _TXcnt=0;
-    _RXcnt=0;
-    for(uint8_t i=0;i<sizeof(RacomPHY._TXBuffer);i++)
-      RacomPHY._TXBuffer[i]=0;
+    RacomPHY._TXcnt=0;
+    RacomPHY._RXcnt=0;
+    for(uint8_t i=0;i<sizeof(RacomPHY._TXBuffer);i++){
+	  RacomPHY._RXBuffer[i]=0;
+	  RacomPHY._TXBuffer[i]=0;
+	}
+	delay(50);
   #endif
 }
 
@@ -20,15 +23,26 @@ void RACOM_PHY::end(){
   #ifdef UART_INTERFACE
     Serial.end();
   #elif defined(I2C_INTERFACE)
+	RacomPHY.flushRx();
+	RacomPHY.flushTx();
     Wire.end();
   #endif
 }
 
+void RACOM_PHY::flushRx(){
+  while(RacomPHY.available()!=0)
+	  RacomPHY.read();
+}
+void RACOM_PHY::flushTx(){
+  #ifdef I2C_INTERFACE
+	RacomPHY._TXcnt = 0;
+  #endif
+}
 int8_t RACOM_PHY::available(){
   #ifdef UART_INTERFACE
     return Serial.available();
   #elif defined(I2C_INTERFACE)
-    return _RXcnt;
+    return RacomPHY._RXcnt;
   #endif
 }
 
@@ -36,8 +50,8 @@ uint8_t RACOM_PHY::write(uint8_t val){
   #ifdef UART_INTERFACE
     return Serial.write(val);
   #elif defined(I2C_INTERFACE)
-    _TXBuffer[_TXcnt]=val;
-    _TXcnt+=1;
+    RacomPHY._TXBuffer[_TXcnt]=val;
+    RacomPHY._TXcnt+=1;
     return 1;
   #endif
 }
@@ -47,8 +61,8 @@ uint8_t RACOM_PHY::write(uint8_t* buf,uint8_t len){
     return Serial.write(buf,len);
   #elif defined(I2C_INTERFACE)
     memcpy(_TXBuffer+_TXcnt,buf,len);
-    _TXcnt+=len;
-	while(_TXcnt!=0){
+    RacomPHY._TXcnt+=len;
+	while(RacomPHY._TXcnt!=0){
 		delay(1);
 	}
     return len;
@@ -61,7 +75,7 @@ uint8_t RACOM_PHY::read(){
   #elif defined(I2C_INTERFACE)
     uint8_t b = RacomPHY._RXBuffer[0];
     memcpy(_RXBuffer,_RXBuffer+1,_RXcnt);
-    _RXcnt -= 1;
+    RacomPHY._RXcnt -= 1;
     return b;
   #endif
 }
@@ -72,15 +86,20 @@ void receiveEvent(int n) {
 	RacomPHY._RXBuffer[RacomPHY._RXcnt]=Wire.read();
 	RacomPHY._RXcnt+=1;
   }
+  
 }
 
 void requestEvent() {
   RacomPHY._RXcnt -= 1;
   uint8_t toRead = RacomPHY._RXBuffer[RacomPHY._RXcnt];
   if(toRead>RacomPHY._TXcnt || toRead ==0){
-	Wire.write(42);
+	for(uint8_t i;i<toRead;i++)
+		Wire.write(0);
+	RacomPHY.end();
+	RacomPHY.begin();
     return;
   }
+
   Wire.write(RacomPHY._TXBuffer,toRead);
   memcpy(RacomPHY._TXBuffer,RacomPHY._TXBuffer+toRead,sizeof(RacomPHY._TXBuffer)-toRead);
   RacomPHY._TXcnt -= toRead;

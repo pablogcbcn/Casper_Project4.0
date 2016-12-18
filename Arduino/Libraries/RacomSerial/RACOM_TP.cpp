@@ -5,6 +5,7 @@ RACOM_TP::RACOM_TP () {
 
 uint8_t RACOM_TP::begin() {
   RacomDL.begin();
+  Serial.println("init");
   this->_available = 0;
   return 1;
 }
@@ -33,11 +34,11 @@ uint8_t RACOM_TP::cmd(){
 
 int8_t RACOM_TP::send(uint8_t cmd,uint16_t dSize,uint8_t* data){
   uint16_t nPacket;
-  if(dSize % MAX_FDATA_SIZE ==0)
-    nPacket = dSize/MAX_FDATA_SIZE;
+  if(dSize % MAX_PDATA_SIZE ==0)
+    nPacket = dSize/MAX_PDATA_SIZE;
   else
-    nPacket = floor(dSize/MAX_FDATA_SIZE)+1;
-  uint8_t packet[MAX_FDATA_SIZE+2];
+    nPacket = floor(dSize/MAX_PDATA_SIZE)+1;
+  uint8_t packet[MAX_PDATA_SIZE+2];
   
   if(nPacket == 1)
     packet[0]=0b00;
@@ -48,8 +49,8 @@ int8_t RACOM_TP::send(uint8_t cmd,uint16_t dSize,uint8_t* data){
 
   for(uint16_t i =0; i<nPacket;i++) {
     uint16_t j=0;
-    for(j=0;j<MAX_FDATA_SIZE&&i*MAX_FDATA_SIZE+j<dSize;j++){
-      packet[2+j] = data[i*MAX_FDATA_SIZE+j];
+    for(j=0;j<MAX_PDATA_SIZE&&i*MAX_PDATA_SIZE+j<dSize;j++){
+      packet[2+j] = data[i*MAX_PDATA_SIZE+j];
     }
     RacomDL.flushRx();
     RacomDL.send(j+2,packet);
@@ -63,7 +64,7 @@ int8_t RACOM_TP::send(uint8_t cmd,uint16_t dSize,uint8_t* data){
     uint8_t reply[replySize];
     RacomDL.read(&replySize,reply);
     uint16_t checkSize = reply[2] +((uint16_t)reply[3]<<8);
-    if(checkSize!=i*60+j)
+    if(checkSize!=i*MAX_PDATA_SIZE+j)
       return -1;
     packet[0]=0b11;
     if(i==nPacket-2)

@@ -18,7 +18,7 @@
 #elif defined(I2C_INTERFACE)
 	#define RACOM_RX_BUFFER 32
 #endif
-#define MAX_FDATA_SIZE (RACOM_RX_BUFFER-4)
+#define MAX_PDATA_SIZE (RACOM_RX_BUFFER-4)
 
 //-----TP Options----------
 

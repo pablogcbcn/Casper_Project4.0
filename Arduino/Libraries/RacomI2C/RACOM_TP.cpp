@@ -5,6 +5,7 @@ RACOM_TP::RACOM_TP () {
 
 uint8_t RACOM_TP::begin() {
   RacomDL.begin();
+  Serial.println("init");
   this->_available = 0;
   return 1;
 }
@@ -85,17 +86,17 @@ int8_t RACOM_TP::available(){
 }
 
 int8_t RACOM_TP::read(uint8_t* cmd,uint16_t* dSize,uint8_t* data){
-  if(this->_available==1) {
+  if(_available==1) {
     *dSize = _dSize;
     *cmd = _cmd;
     memcpy(data,_data,_dSize);
-    this->_available = 0;
+    _available = 0;
     free(_data);
     _data = NULL;
     _dSize=0;
     return 1;
   }
-  return this->_available;
+  return _available;
 }
 
 int8_t RACOM_TP::readSM(){
@@ -113,6 +114,7 @@ int8_t RACOM_TP::readSM(){
     uint8_t tmp[pSize];
     RacomDL.read(&pSize,tmp);
     uint8_t pFlags = tmp[0];
+    RacomDL.flushRx();
     
     if(_data == NULL) {
       _data = (uint8_t*)malloc(pSize-2);
