@@ -89,6 +89,7 @@ def Mpr121_Touch():
     for i in range(8):
         s += str(1 & (l[0]>>(7-i)))
         s += "|"
+    s=s.replace("1"," ")
     rospy.loginfo(s)
 
 def readSensors():
@@ -103,7 +104,7 @@ def initTopics():
     global rate
     pub = rospy.Publisher('Sensing_Results', Sensing, queue_size=10)
     rospy.init_node('Casper_Sensing', anonymous=True)
-    rate = rospy.Rate(50) # 30hz
+    rate = rospy.Rate(50) # 50hz
 
 
 def Casper_Sensing():

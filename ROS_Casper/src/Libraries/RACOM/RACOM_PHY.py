@@ -87,7 +87,6 @@ class I2C(object):
 		self.open()
 
 	def flushRx(self):
-		print "flushrx"
 		self.readBytes(32)
 		return
 	

@@ -54,7 +54,6 @@ class RACOM_TP :
 			reply = self.RacomDL.read()
 			if reply is 0 or len(reply) != 4:
 				self.RacomDL.reset()
-				print reply
 				return -3
 			checkSize = reply[2]+(reply[3]<<8)
 			if checkSize!=(len(packet)-2+i*self.RacomDL.MAX_PDATA_SIZE):

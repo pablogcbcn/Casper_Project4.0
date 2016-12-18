@@ -2,21 +2,23 @@
 
 void setup() {
   Racom.begin(); // begin Transport layer
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
 }
 
 void loop() {
   // first check if a packet is available
   if(Racom.available() == 1) {
-    // read the cmd byte
     uint8_t cmd = Racom.cmd();
-    //read the size of the available data
     uint16_t dSize = Racom.dSize(); 
-    // allocate memory for the data
     uint8_t *data = (uint8_t*)malloc(dSize);
-    // read the data and test if the reading suceeded
-    if(Racom.read(&cmd,&dSize,data)==1){
-      Racom.send(cmd,dSize,data);
+    if(cmd==0x10){
+      if(data[0] == 0)
+        digitalWrite(13,LOW);
+      else if(data[0] == 1)
+        digitalWrite(13,HIGH);
     }
+    
     //free the packet memory
     free(data);
     data = NULL;
