@@ -1,12 +1,14 @@
 from RACOM_DL import RACOM_DL
 from math import ceil
+from datetime import datetime
+from time import sleep
+
 
 class RACOM_TP :
 	_data = []
 	_dSize = 0
 	_cmd=0
-	
-	#RacomDL = RACOM_DL("I2C")
+
 	
 	def __init__(self,interfaceName):
 		self.RacomDL=RACOM_DL(interfaceName)
@@ -37,18 +39,27 @@ class RACOM_TP :
 				j+=1
 			del packet[j+2:]
 			self.RacomDL.send(packet)
-			code = self.RacomDL.available()
-			while code !=1:
-				if code <0:
-					return code
-				code = self.RacomDL.available()
+			
+			_t0 = datetime.now()
+			while True :
+				code=self.RacomDL.available()
+				if code is -1:
+					return -1
+				elif (datetime.now()-_t0).total_seconds() > self.RacomDL._TIMEOUT:
+					self.RacomDL.reset()
+					return -2
+				elif code == 1:
+					break
 			
 			reply = self.RacomDL.read()
-			if reply is 0 or len(reply) != 3:
-				return 0
+			if reply is 0 or len(reply) != 4:
+				self.RacomDL.reset()
+				print reply
+				return -3
 			checkSize = reply[2]+(reply[3]<<8)
-			if checkSize!=len(packet)-2+i*60:
-				return 0
+			if checkSize!=(len(packet)-2+i*self.RacomDL.MAX_PDATA_SIZE):
+				self.RacomDL.reset()
+				return -4
 			packet[0]=0b11
 			if(i==nPacket-2):
 				packet[0]=0b10
@@ -69,6 +80,8 @@ class RACOM_TP :
 		if self.RacomDL.available()>0:
 			pSize = self.RacomDL.pSize()
 			tmp=self.RacomDL.read()
+			if type(tmp) != list or len(tmp)<2:
+				return -1
 			pFlags = tmp[0]&0b11
 			self._cmd = tmp[1]
 			s = self._dSize+pSize -2

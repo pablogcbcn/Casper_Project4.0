@@ -3,11 +3,12 @@
 import logging
 import RACOM_PHY
 from datetime import datetime
+from time import sleep
 
 
 class RACOM_DL(object):
     # Com properties
-    _TIMEOUT = 0.1
+    _TIMEOUT = 0.5
     #Frame properties
     _STX = 0x02  # start
 
@@ -19,7 +20,7 @@ class RACOM_DL(object):
     _cnt = 0
     _available = 0
 
-    MAX_PDATA_SIZE = 60
+    MAX_PDATA_SIZE = 1
     
     def __init__(self,interfaceName):
         """
@@ -29,11 +30,18 @@ class RACOM_DL(object):
         self.logger = logging.getLogger(__name__)
         if interfaceName == "UART":
             self.RacomPHY = RACOM_PHY.UART(self.baudrate,self._TIMEOUT)
+            self.MAX_PDATA_SIZE = 60
         elif interfaceName == "I2C":
             self.RacomPHY = RACOM_PHY.I2C(8)
-        
+            self.MAX_PDATA_SIZE = 8
+
+    def reset(self):
+        self._available=0
+        self._state = 0
+        self.RacomPHY.flushRx()
+        sleep(0.5)
+
     def formatPacket(self, packet):
-        
         frame = []
         frame.append(self._STX)
         frame.append((len(packet)<<2) + (packet[0] & 0b11))
@@ -61,7 +69,8 @@ class RACOM_DL(object):
         return self._pSize
         
     def available(self):
-        self.readSM()
+        if(self.readSM()==-1):
+            return -1
         return self._available
     
     def readSM(self):
@@ -69,8 +78,7 @@ class RACOM_DL(object):
         _WAITING_STATE = 0
         _START_STATE = 1
         _WAIT_DATA_STATE = 2
-        # if self._state != 0:
-             # print "state",self._state
+
         if self._state is _WAITING_STATE:
             byte = []
             while self.RacomPHY.available() != 0 :
@@ -88,7 +96,7 @@ class RACOM_DL(object):
                     self._state = _START_STATE
 
         elif self._state is _START_STATE:
-            self._t0 = datetime.now()            
+            self._t0 = datetime.now()
             if self.RacomPHY.available() > 0 and self._available == 0:
                 self._packet = []
                 self._pSize = self.RacomPHY.read()[0]
@@ -120,7 +128,6 @@ class RACOM_DL(object):
             if self.RacomPHY.available() == -1 and self._cnt < self._pSize:
                 self._packet[len(self._packet):]=self.RacomPHY.readBytes(self._pSize-1)
                 self._cnt+=self._pSize-1
-            #print self._packet
             if (datetime.now()-self._t0).total_seconds() >= self._TIMEOUT :
                 self._state = _WAITING_STATE
                 return -1

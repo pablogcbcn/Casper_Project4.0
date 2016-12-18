@@ -4,7 +4,6 @@ from random import randint
 from datetime import datetime
 from time import sleep
 
-
 def test(s):
 	data = range(s)
 	cmd = 1
@@ -12,7 +11,13 @@ def test(s):
 	#for i in data:
 	#	data[i] = randint(0,255)
 		
-	RacomTP.send(cmd,data)
+	code = RacomTP.send(cmd,data)
+	if code < 0:
+		print code
+		return 0
+	#sleep(0.01)
+		
+
 
 	_t0 = datetime.now()
 	while True :
@@ -27,7 +32,6 @@ def test(s):
 	else:
 		return 0
 
-print "RACOM TRANPORT LAYER TEST 01"
 
 payload_size = 255
 N = 10
@@ -35,9 +39,10 @@ N = 10
 ok = 0
 ko = 0
 
+print "RACOM TRANPORT LAYER TEST 01"
 iface = raw_input("Interface to test: ") or "I2C"
 payload_size = int(raw_input("Enter payload size: ") or "16")
-N = int(raw_input("Enter number of tests:") or "10")
+N = int(raw_input("Enter number of tests:") or "100")
 sys.stdout.write("Testing: ")
 print iface,"interface"
 RacomTP = RACOM_TP(iface)
@@ -50,7 +55,7 @@ for i in range(N):
 		ko+=1
 	else:
 		ok+=1
-	sleep(0.01)
+	#sleep(0.02)
 	sys.stdout.write("\t %d %% complete         \r" % int((i+1.0)/(N)*100))
 	sys.stdout.flush()
 		

@@ -1,8 +1,8 @@
 #include <RacomSerial.h> // include RACOM lib
 
 void setup() {
+  Serial.begin(115200);
   Racom.begin(); // begin Transport layer
-
 }
 
 void loop() {
@@ -16,12 +16,6 @@ void loop() {
     uint8_t *data = (uint8_t*)malloc(dSize);
     // read the data and test if the reading suceeded
     if(Racom.read(&cmd,&dSize,data)==1){
-//      for(uint8_t i =0;i<dSize;i++){
-//        Serial.print(data[i]);
-//        Serial.print(" ");
-//      }
-//      Serial.println("");
-      //send back the exact same packet for testing purposes
       Racom.send(cmd,dSize,data);
     }
     //free the packet memory

@@ -20,6 +20,10 @@ class UART(object):
         self.connection.flushInput()
         self.connection.flushOutput()
 
+    def flushRx(self):
+        while self.available() != 0:
+            self.read()
+
     def open(self):
         """
         Open the serial port
@@ -81,10 +85,13 @@ class I2C(object):
 		self.bus_number = 1
 		self.slaveAdress = slaveAdress
 		self.open()
-		self._RXBuffer = []
-		
+
+	def flushRx(self):
+		print "flushrx"
+		self.readBytes(32)
+		return
+	
 	def open(self):
-		smbus.SMBus(1).close()
 		try:
 			self.bus = smbus.SMBus(1)
 		except:
@@ -99,19 +106,14 @@ class I2C(object):
 		try:
 			self.bus.write_i2c_block_data(self.slaveAdress,data[0],data[1:])
 		except:
-			self.close()
-			self.open()
-		#sleep(0.01)
+			return 0
 	
 	def read(self):
 		data=[]
 		try:
 			data=[self.bus.read_byte_data(self.slaveAdress,1)]
 		except:
-			self.close()
-			self.open()
-			#sleep(0.1)
-			data=[]
+			return []
 		return data
 		
 	def readBytes(self,len):
@@ -121,9 +123,6 @@ class I2C(object):
 		try:
 			data = self.bus.read_i2c_block_data(self.slaveAdress,len)
 		except:
-			self.close()
-			self.open()
-			#sleep(0.1)
 			return []
 		if type(data) is int:
 			return [data]
