@@ -7,52 +7,41 @@ from Libraries.RACOM.RACOM_TP import RACOM_TP
 
 
 RacomTP = None
-rate = None
-st = "OFF"
+
+previousL = 0
+previousH = 0
 
 def callback_Stages(data):
     rospy.loginfo("Casper_Intelligence is talking")
     
 def callback_Sensing(data):
-    return
-    #rospy.loginfo("Casper_Sensing is talking")
-
-def led_tgl():
-    global RacomTP
-    global st
-    if st is "ON":
-        if RacomTP.send(0x10, [0]) < 0:
-            rospy.loginfo("RACOM sending error")
-        st = "OFF"
-    elif st is "OFF":
-        if RacomTP.send(0x10, [1]) < 0:
-            rospy.loginfo("RACOM sending error")
-        st = "ON"
-
+    global previousL
+    global previousH
+    previousL = data.mpr121L
+    previousH = data.mpr121H
+		
 def Casper_Motion():
-    global rate
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # node are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
     rospy.init_node('Casper_Motion', anonymous=True)
-    rate = rospy.Rate(2)
     #Casper_Motion subscription
-    rospy.loginfo("Subscripting to topic Sensing_Results")
+    rospy.loginfo("Subscribing to topic Sensing_Results")
     rospy.Subscriber("Sensing_Results", Sensing, callback_Sensing)
-    rospy.loginfo("Subscripting to topic Casper_Stages")
+    rospy.loginfo("Subscribing to topic Casper_Stages")
     rospy.Subscriber("Casper_Stages", Stages, callback_Stages)
-    
+    rate = rospy.Rate(30)
     while not rospy.is_shutdown():
-        led_tgl()
+        if(previousL!=0):
+            RacomTP.send(0x10, [1])
+        else:
+            RacomTP.send(0x10, [0])
         rate.sleep()
+
+    rospy.spin()
 
 
 if __name__ == '__main__':
     global RacomTP
     try:
-        RacomTP = RACOM_TP("I2C")
+        RacomTP = RACOM_TP("/dev/ttyACM0")
         Casper_Motion()
         
     except rospy.ROSInterruptException:

@@ -90,7 +90,7 @@ def Mpr121_Touch():
         s += str(1 & (l[0]>>(7-i)))
         s += "|"
     s=s.replace("1"," ")
-    rospy.loginfo(s)
+    #rospy.loginfo(s)
 
 def readSensors():
     Mpr121_Touch()

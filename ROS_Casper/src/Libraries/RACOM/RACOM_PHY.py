@@ -11,10 +11,11 @@ from time import sleep
 
 class UART(object):
 
-    def __init__(self, baudrate, timeout=0.001):
+    def __init__(self, name, baudrate, timeout=0.001):
         self.__baudrate = baudrate
         self.__timeOut = timeout
         self.connection = None
+        self._name = name
 
         self.open()
         self.connection.flushInput()
@@ -30,7 +31,7 @@ class UART(object):
         """
         try:
             if self.connection == None or self.connection.isOpen() is False:
-                self.connection = serial.Serial("/dev/ttyAMA0",  self.__baudrate, 8, serial.PARITY_NONE, serial.STOPBITS_ONE, xonxoff=0, rtscts=0, timeout=self.__timeOut)
+                self.connection = serial.Serial(self._name,  self.__baudrate, 8, serial.PARITY_NONE, serial.STOPBITS_ONE, xonxoff=0, rtscts=0, timeout=self.__timeOut)
         except serial.SerialException:
             pass
 

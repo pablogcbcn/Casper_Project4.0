@@ -29,7 +29,10 @@ class RACOM_DL(object):
         self.baudrate = 115200
         self.logger = logging.getLogger(__name__)
         if interfaceName == "UART":
-            self.RacomPHY = RACOM_PHY.UART(self.baudrate,self._TIMEOUT)
+            self.RacomPHY = RACOM_PHY.UART("/dev/ttyAMA0",self.baudrate,self._TIMEOUT)
+            self.MAX_PDATA_SIZE = 60
+        elif "/dev/tty" in interfaceName:
+            self.RacomPHY = RACOM_PHY.UART(interfaceName,self.baudrate,self._TIMEOUT)
             self.MAX_PDATA_SIZE = 60
         elif interfaceName == "I2C":
             self.RacomPHY = RACOM_PHY.I2C(8)
