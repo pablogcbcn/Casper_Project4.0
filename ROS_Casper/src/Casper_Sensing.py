@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 # license removed for brevity
 import rospy
 import sys
@@ -38,12 +38,18 @@ def get_I2C_Word(address, register):
 
 def initMpu6050():
     set_I2C_register(0x68, 0x6B, 0x00)
-    l = get_I2C_Word(0x68, 0x3B)
+    l = get_I2C_Word(0x68, 0x43)
     initMpu6050.mpuGyro_X = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3D)
+    l = get_I2C_Word(0x68, 0x45)
     initMpu6050.mpuGyro_Y = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3F)
+    l = get_I2C_Word(0x68, 0x47)
     initMpu6050.mpuGyro_Z = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3B)
+    initMpu6050.mpuAcc_X = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3D)
+    initMpu6050.mpuAcc_Y = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3F)
+    initMpu6050.mpuAcc_Z = ((l[0] << 8) | l[1])
 
 
 def initMpr121(): 
@@ -91,7 +97,7 @@ def Mpr121_Touch():
     l = get_I2C_Word(0x5A,0x00)
     sensing_msg.mpr121L = l[0]
     sensing_msg.mpr121H = l[1]
-    s = ""
+    s = "Touch detection: "
     for i in range(4):
         s += str(1 & (l[1]>>(3-i)))
         s += "|"
@@ -99,7 +105,7 @@ def Mpr121_Touch():
         s += str(1 & (l[0]>>(7-i)))
         s += "|"
     s=s.replace("1"," ")
-    #rospy.loginfo(s)
+    rospy.loginfo(s)
 
 def Mpu6050_Accelerometer():
     l = get_I2C_Word(0x68, 0x3B)
@@ -108,22 +114,22 @@ def Mpu6050_Accelerometer():
     sensing_msg.mpuAcc_Y = ((l[0] << 8) | l[1])
     l = get_I2C_Word(0x68, 0x3F)
     sensing_msg.mpuAcc_Z = ((l[0] << 8) | l[1])
-    s = ""
-    s += str(sensing_msg.mpuAcc_X)
+    s = "Accelerometer:   "
+    s += str(sensing_msg.mpuAcc_X - initMpu6050.mpuAcc_X)
     s += "|"
-    s += str(sensing_msg.mpuAcc_Y)
+    s += str(sensing_msg.mpuAcc_Y - initMpu6050.mpuAcc_Y)
     s += "|"
-    s += str(sensing_msg.mpuAcc_Z)
+    s += str(sensing_msg.mpuAcc_Z - initMpu6050.mpuAcc_Z)
     rospy.loginfo(s)
 
 def Mpu6050_Gyroscope():
-    l = get_I2C_Word(0x68, 0x3B)
+    l = get_I2C_Word(0x68, 0x43)
     sensing_msg.mpuGyro_X = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3D)
+    l = get_I2C_Word(0x68, 0x45)
     sensing_msg.mpuGyro_Y = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3F)
+    l = get_I2C_Word(0x68, 0x47)
     sensing_msg.mpuGyro_Z = ((l[0] << 8) | l[1])
-    s = ""
+    s = "Gyroscope:       "
     s += str(sensing_msg.mpuGyro_X - initMpu6050.mpuGyro_X)
     s += "|"
     s += str(sensing_msg.mpuGyro_Y - initMpu6050.mpuGyro_Y)
@@ -133,12 +139,12 @@ def Mpu6050_Gyroscope():
 
 def readSensors():
     global sensing_msg
-    #Mpr121_Touch()
+    Mpr121_Touch()
     Mpu6050_Gyroscope()
     Mpu6050_Accelerometer()
 
 def initSensors():
-    #initMpr121()
+    initMpr121()
     initMpu6050()
     rospy.loginfo("Sensing Interface Initializated!")
 
