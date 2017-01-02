@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 # license removed for brevity
 import rospy
 import sys
@@ -38,6 +38,13 @@ def get_I2C_Word(address, register):
 
 def initMpu6050():
     set_I2C_register(0x68, 0x6B, 0x00)
+    l = get_I2C_Word(0x68, 0x3B)
+    initMpu6050.mpuGyro_X = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3D)
+    initMpu6050.mpuGyro_Y = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3F)
+    initMpu6050.mpuGyro_Z = ((l[0] << 8) | l[1])
+
 
 def initMpr121(): 
     set_I2C_register(0x5A, SOFT_RST, 0x63)
@@ -94,22 +101,41 @@ def Mpr121_Touch():
     s=s.replace("1"," ")
     #rospy.loginfo(s)
 
-def Mpu6050_Gyroscope();
+def Mpu6050_Accelerometer():
     l = get_I2C_Word(0x68, 0x3B)
-    sensing_msg.mpuGyro_X = (l[0] << 8) | l[1])
-    rospy.loginfo(sensing_msg.mpuGyro_X)
+    sensing_msg.mpuAcc_X = ((l[0] << 8) | l[1])
     l = get_I2C_Word(0x68, 0x3D)
-    sensing_msg.mpuGyro_Y = (l[0] << 8) | l[1])
-    rospy.loginfo(sensing_msg.mpuGyro_Y)
+    sensing_msg.mpuAcc_Y = ((l[0] << 8) | l[1])
     l = get_I2C_Word(0x68, 0x3F)
-    sensing_msg.mpuGyro_Z = (l[0] << 8) | l[1])
-    rospy.loginfo(sensing_msg.mpuGyro_Z)
+    sensing_msg.mpuAcc_Z = ((l[0] << 8) | l[1])
+    s = ""
+    s += str(sensing_msg.mpuAcc_X)
+    s += "|"
+    s += str(sensing_msg.mpuAcc_Y)
+    s += "|"
+    s += str(sensing_msg.mpuAcc_Z)
+    rospy.loginfo(s)
+
+def Mpu6050_Gyroscope():
+    l = get_I2C_Word(0x68, 0x3B)
+    sensing_msg.mpuGyro_X = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3D)
+    sensing_msg.mpuGyro_Y = ((l[0] << 8) | l[1])
+    l = get_I2C_Word(0x68, 0x3F)
+    sensing_msg.mpuGyro_Z = ((l[0] << 8) | l[1])
+    s = ""
+    s += str(sensing_msg.mpuGyro_X - initMpu6050.mpuGyro_X)
+    s += "|"
+    s += str(sensing_msg.mpuGyro_Y - initMpu6050.mpuGyro_Y)
+    s += "|"
+    s += str(sensing_msg.mpuGyro_Z - initMpu6050.mpuGyro_Z)
+    rospy.loginfo(s)
 
 def readSensors():
     global sensing_msg
     #Mpr121_Touch()
     Mpu6050_Gyroscope()
-    #Mpu6050_Accelerometer()
+    Mpu6050_Accelerometer()
 
 def initSensors():
     #initMpr121()
@@ -121,7 +147,7 @@ def initTopics():
     global rate
     pub = rospy.Publisher('Sensing_Results', Sensing, queue_size=10)
     rospy.init_node('Casper_Sensing', anonymous=True)
-    rate = rospy.Rate(50) # 50hz
+    rate = rospy.Rate(1) # 50hz
 
 
 def Casper_Sensing():
