@@ -94,7 +94,7 @@ def Mpr121_Touch():
     s=s.replace("1"," ")
     #rospy.loginfo(s)
 
-def Mpu6050_Gyroscope()
+def Mpu6050_Gyroscope();
     l = get_I2C_Word(0x68, 0x3B)
     sensing_msg.mpuGyro_X = (l[0] << 8) | l[1])
     rospy.loginfo(sensing_msg.mpuGyro_X)
@@ -112,7 +112,7 @@ def readSensors():
     #Mpu6050_Accelerometer()
 
 def initSensors():
-    initMpr121()
+    #initMpr121()
     initMpu6050()
     rospy.loginfo("Sensing Interface Initializated!")
 
