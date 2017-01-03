@@ -37,20 +37,8 @@ def get_I2C_Word(address, register):
     return RacomTP.read()
 
 def initMpu6050():
+    global timer = micros()
     set_I2C_register(0x68, 0x6B, 0x00)
-    l = get_I2C_Word(0x68, 0x43)
-    initMpu6050.mpuGyro_X = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x45)
-    initMpu6050.mpuGyro_Y = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x47)
-    initMpu6050.mpuGyro_Z = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3B)
-    initMpu6050.mpuAcc_X = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3D)
-    initMpu6050.mpuAcc_Y = ((l[0] << 8) | l[1])
-    l = get_I2C_Word(0x68, 0x3F)
-    initMpu6050.mpuAcc_Z = ((l[0] << 8) | l[1])
-
 
 def initMpr121(): 
     set_I2C_register(0x5A, SOFT_RST, 0x63)
@@ -129,12 +117,34 @@ def Mpu6050_Gyroscope():
     sensing_msg.mpuGyro_Y = ((l[0] << 8) | l[1])
     l = get_I2C_Word(0x68, 0x47)
     sensing_msg.mpuGyro_Z = ((l[0] << 8) | l[1])
+  
+    dt = (double)(micros() - initMpu6050.timer) / 1000000; #This line does three things: 1) stops the timer, 2)converts the timer's output to seconds from microseconds, 3)casts the value as a double saved to "dt".
+    initMpu6050.timer = micros(); #start the timer again so that we can calculate the next dt.
+
+    #the next two lines calculate the orientation of the accelerometer relative to the earth and convert the output of atan2 from radians to degrees
+    #We will use this data to correct any cumulative errors in the orientation that the gyroscope develops.
+    roll = atan2(AcY, AcZ)*degconvert;
+    pitch = atan2(-AcX, AcZ)*degconvert;
+
+    #The gyroscope outputs angular velocities.  To convert these velocities from the raw data to deg/second, divide by 131.  
+    #Notice, we're dividing by a double "131.0" instead of the int 131.
+    gyroXrate = GyX/131.0;
+    gyroYrate = GyY/131.0;
+
+    #THE COMPLEMENTARY FILTER
+    #This filter calculates the angle based MOSTLY on integrating the angular velocity to an angular displacement.
+    #dt, recall, is the time between gathering data from the MPU6050.  We'll pretend that the 
+    #angular velocity has remained constant over the time dt, and multiply angular velocity by 
+    #time to get displacement.
+    #The filter then adds a small correcting factor from the accelerometer ("roll" or "pitch"), so the gyroscope knows which way is down. 
+    compAngleX = 0.99 * (compAngleX + gyroXrate * dt) + 0.01 * roll; # Calculate the angle using a Complimentary filter
+    compAngleY = 0.99 * (compAngleY + gyroYrate * dt) + 0.01 * pitch; 
+
     s = "Gyroscope:       "
-    s += str(sensing_msg.mpuGyro_X - initMpu6050.mpuGyro_X)
+    s += str(compAngleX)
     s += "|"
-    s += str(sensing_msg.mpuGyro_Y - initMpu6050.mpuGyro_Y)
+    s += str(compAngleY)
     s += "|"
-    s += str(sensing_msg.mpuGyro_Z - initMpu6050.mpuGyro_Z)
     rospy.loginfo(s)
 
 def readSensors():
