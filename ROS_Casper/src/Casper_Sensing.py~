@@ -39,19 +39,8 @@ def get_I2C_Word(address, register):
         continue
     return RacomTP.read()
 
-def set_GPIO_mode(pin, mode):
-    global RacomTP
-    data = [pin, mode]
-    RacomTP.send(0x19, data)
-
-def set_GPIO(pin, output):
-    global RacomTP
-    data = [pin, output]
-    RacomTP.send(0x17, data)
-
 def initGPIO():
-    set_GPIO_mode(13, OUTPUT)
-    set_GPIO(13, LOW)
+    set_GPIO_mode(13, 
     
 def initMpu6050():
     global timer
@@ -194,7 +183,7 @@ def Mpu6050_Gyroscope():
 def readSensors():
     global sensing_msg
     #Mpr121_Touch()
-    #Mpu6050_Gyroscope()
+    Mpu6050_Gyroscope()
    # Mpu6050_Accelerometer()
 
 def initSensors():
