@@ -100,96 +100,118 @@ int8_t RACOM_TP::read(uint8_t* cmd,uint16_t* dSize,uint8_t* data){
 }
 
 int8_t RACOM_TP::readSM(){
-  uint8_t okReply[] = {0,0,0,0};
-  int8_t dlStatus = RacomDL.available();
-  if(dlStatus < 0) {
-    // Timeout of receiving packet
-    _available = -1;
-    RacomDL.flushRx();
-    return -1;
-  }
-  else if(dlStatus >0) {
-    uint8_t pSize = RacomDL.pSize();
-    
-    uint8_t tmp[pSize];
-    RacomDL.read(&pSize,tmp);
-    uint8_t pFlags = tmp[0];
-    RacomDL.flushRx();
-    
-    if(_data == NULL) {
-      _data = (uint8_t*)malloc(pSize-2);
-      if(_data == NULL){
-        okReply[1] = 0xFF;
-        RacomDL.send(2,okReply);
-      }
-      _available=0;
-    }
-    else {
-      
-      uint8_t* tmpPtr;
-      tmpPtr = (uint8_t*)realloc(_data,_dSize+pSize-2);
-      if(tmpPtr != NULL)
-        _data=tmpPtr;
-      else {
-        _available = -1;
-        okReply[1] = 0xFF; // error cmd
-        RacomDL.send(4,okReply);
-        free(_data);
-        _data=NULL;
-        _dSize = 0;
-        return -1;
-      }
-    }
-    _cmd = tmp[1];
-    // set data of the reply to _dSize+pSize-2
-    okReply[1] = 0; // cmd = 0
-    uint16_t s = _dSize+pSize-2;
-    okReply[2] = s&0xFF;
-    okReply[3] = ((s&0xFF00)>>8);
-    
-    switch(pFlags) {
-      case 0b00: {
-        _dSize = 0;
-        memcpy(_data+_dSize,tmp+2,pSize-2);
-        _dSize+=pSize-2;
-        RacomDL.send(4,okReply);
-        _available = 1;
-        return 1;
-      } break;
-      case 0b01: {
-        _dSize = 0;
-        memcpy(_data+_dSize,tmp+2,pSize-2);
-        _dSize+=pSize-2;
-        RacomDL.send(4,okReply);
-        _available = 0;
-        return 0;
-      } break;
-      case 0b11: {
-        memcpy(_data+_dSize,tmp+2,pSize-2);
-        _dSize+=pSize-2;
-        RacomDL.send(4,okReply);
-        _available = 0;
-        return 0;
-      } break;
-      case 0b10: {
-        memcpy(_data+_dSize,tmp+2,pSize-2);
-        _dSize+=pSize-2;
-        RacomDL.send(4,okReply);
-        _available = 1;
-        return 1;
-      } break;
-      default : {
-        okReply[1] = 0xFF;
-        RacomDL.send(4,okReply);
-        _available = -1;
-        return -1;
-      } break;
-    }
-    RacomDL.send(4,okReply);
-    return _available;
-  }
-  else
-    return 0;
+	static uint32_t _t0;
+	uint8_t okReply[] = {0,0,0,0};
+	
+	switch(this->_state) {
+		case _TP_IDLE_STATE: {
+			_t0 = millis();
+			if(RacomDL.available()>0){
+				this->_dSize = 0;
+				uint8_t pSize = RacomDL.pSize();
+				uint8_t tmp[pSize];
+				RacomDL.read(&pSize,tmp);
+				_data = (uint8_t*)malloc(pSize-2);
+				this->_available=0;
+				if(_data == NULL){
+					okReply[1] = 0xFF;
+					RacomDL.send(2,okReply);
+					return -1;
+				}
+				switch(tmp[0]){
+					case 0b00:{
+						memcpy(this->_data+this->_dSize,tmp+2,pSize-2);
+						this->_dSize += pSize-2;
+						this->_state = _TP_DATA_FULL_STATE;
+						okReply[1] = _ACK_CMD; // cmd = 0
+						okReply[2] = this->_dSize&0xFF;
+						okReply[3] = ((this->_dSize&0xFF00)>>8);
+						RacomDL.send(4,okReply);
+						return this->readSM();
+					}break;
+					case 0b01:{
+						memcpy(this->_data+this->_dSize,tmp+2,pSize-2);
+						this->_dSize += pSize-2;
+						okReply[1] = _ACK_CMD; // cmd = 0
+						okReply[2] = this->_dSize&0xFF;
+						okReply[3] = ((this->_dSize&0xFF00)>>8);
+						RacomDL.send(4,okReply);
+						this->_state = _TP_WAITING_STATE;
+						return 0;
+					}break;
+					default:
+						return -1;
+					break;
+				}
+			}
+		}break;
+		case _TP_WAITING_STATE: {
+			if((millis()-_t0)>= TIMEOUT){
+				okReply[1] = 0xFF; // error cmd
+				RacomDL.send(2,okReply);
+				free(this->_data);
+				this->_data=NULL;
+				this->_state=_TP_IDLE_STATE;
+				this->_available = 0;
+				return -1;
+			}
+			if(RacomDL.available()>0){
+				uint8_t pSize = RacomDL.pSize();
+				uint8_t tmp[pSize];
+				RacomDL.read(&pSize,tmp);
+				uint8_t* tmpPtr;
+				tmpPtr = (uint8_t*)realloc(_data,_dSize+pSize-2);
+				if(tmpPtr == NULL){
+					okReply[1] = 0xFF; // error cmd
+					RacomDL.send(2,okReply);
+					free(this->_data);
+					this->_data=NULL;
+					this->_state=_TP_IDLE_STATE;
+					this->_available = 0;
+					return -1;
+				}
+				else
+					_data=tmpPtr;
+				switch(tmp[0]){
+					case 0b11:{
+						memcpy(_data+_dSize,tmp+2,pSize-2);
+						this->_dSize+=pSize-2;
+						okReply[1] = _ACK_CMD; // cmd = 0
+						okReply[2] = this->_dSize&0xFF;
+						okReply[3] = ((this->_dSize&0xFF00)>>8);
+						RacomDL.send(4,okReply);
+						this->_state=_TP_WAITING_STATE;
+						return 0;
+					}break;
+					case 0b10:{
+						memcpy(_data+_dSize,tmp+2,pSize-2);
+						this->_dSize+=pSize-2;
+						okReply[1] = _ACK_CMD; // cmd = 0
+						okReply[2] = this->_dSize&0xFF;
+						okReply[3] = ((this->_dSize&0xFF00)>>8);
+						RacomDL.send(4,okReply);
+						this->_state=_TP_DATA_FULL_STATE;
+						return this->readSM();
+					}break;
+					default:
+						okReply[1] = 0xFF; // error cmd
+						RacomDL.send(2,okReply);
+						free(this->_data);
+						this->_data=NULL;
+						this->_state=_TP_IDLE_STATE;
+						this->_available = 0;
+						return -1;
+					break;
+				}
+			}
+		}break;
+		case _TP_DATA_FULL_STATE: {
+			this->_available = 1;
+			this->_state=_TP_IDLE_STATE;
+			return 1;
+		}break;
+	}
+	return 0;
 }
 
 RACOM_TP Racom = RACOM_TP();

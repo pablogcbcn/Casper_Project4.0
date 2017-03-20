@@ -6,13 +6,11 @@
 #include "Wire.h"
 
 class RACOM_PHY {
-  private:
     #ifdef I2C_INTERFACE
     
     #endif
   public:
     #ifdef I2C_INTERFACE
-    uint8_t _LBsize;
 	uint8_t _TXBuffer[32];
     uint8_t _RXBuffer[32];
     uint8_t _TXcnt;
@@ -21,7 +19,7 @@ class RACOM_PHY {
     
     RACOM_PHY();
 
-    void begin();    
+    void begin();
     void end();
 
     int8_t available();
@@ -32,7 +30,6 @@ class RACOM_PHY {
 	void flushRx();
 	void flushTx();
     //static void requestEvent();
-    
 };
 void receiveEvent(int n);
 void requestEvent();

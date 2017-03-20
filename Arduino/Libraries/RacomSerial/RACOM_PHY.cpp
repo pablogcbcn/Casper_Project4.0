@@ -20,23 +20,30 @@ void RACOM_PHY::begin(){
 }
 
 void RACOM_PHY::end(){
+	RacomPHY.flushRx();
+	RacomPHY.flushTx();
   #ifdef UART_INTERFACE
     Serial.end();
   #elif defined(I2C_INTERFACE)
-	RacomPHY.flushRx();
-	RacomPHY.flushTx();
     Wire.end();
   #endif
 }
 
 void RACOM_PHY::flushRx(){
-  while(RacomPHY.available()!=0)
-	  RacomPHY.read();
+	#ifdef I2C_INTERFACE
+		RacomPHY._RXcnt = 0;
+	#elif defined(UART_INTERFACE)
+		while(Serial.available()!=0)
+			Serial.read();
+	#endif
 }
+
 void RACOM_PHY::flushTx(){
-  #ifdef I2C_INTERFACE
-	RacomPHY._TXcnt = 0;
-  #endif
+	#ifdef I2C_INTERFACE
+		RacomPHY._TXcnt = 0;
+	#else
+		Serial.flush();
+	#endif
 }
 int8_t RACOM_PHY::available(){
   #ifdef UART_INTERFACE
@@ -86,7 +93,6 @@ void receiveEvent(int n) {
 	RacomPHY._RXBuffer[RacomPHY._RXcnt]=Wire.read();
 	RacomPHY._RXcnt+=1;
   }
-  
 }
 
 void requestEvent() {

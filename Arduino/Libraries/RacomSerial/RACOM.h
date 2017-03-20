@@ -14,7 +14,11 @@
 //-----DL Options----------
 
 #ifdef UART_INTERFACE
-	#define RACOM_RX_BUFFER SERIAL_RX_BUFFER_SIZE
+	#ifdef ESP_H // if an ESP8266 based arduino is used
+		#define RACOM_RX_BUFFER 64
+	#else
+		#define RACOM_RX_BUFFER SERIAL_RX_BUFFER_SIZE
+	#endif
 #elif defined(I2C_INTERFACE)
 	#define RACOM_RX_BUFFER 32
 #endif
